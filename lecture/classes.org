@@ -1,0 +1,275 @@
+** Title slide							      :slide:
+#+BEGIN_SRC emacs-lisp-slide
+(org-show-animate '("C++ Classes" "Evan Misshula"))
+#+END_SRC
+
+** C++ Structures: Classes					      :slide:
+   - classes are types of groups of built in types
+   - an /instance/ of a class is a member
+   - functions on instances of a class are called /methods/
+** What we will cover						      :slide:
+   - access permissions
+     - private
+     - public
+     - protected
+   - Struct vs. Class
+     - defined
+     - header and implementation
+     - inline
+     - static vars
+   - implementing access
+     - ctor
+     - dtor
+     - copy ctor
+** Example							      :slide:
+You declare a structure
+
+#+BEGIN_SRC c :tangle yes policeCar.c
+  struct PoliceCar
+  {
+    float locX;
+    float locY;
+    float facing;
+    int OfficerCount;
+  };
+  PoliceCar p1;
+#+END_SRC
+
+What if someone makes the number of officers negative?
+  - *Don't assume someone has read your documentaion*
+
+** General definitions						      :slide:
+#+BEGIN_SRC c++
+  class ClassName {
+    access_modifier1:
+      field11_definition;
+      field12_definition;
+
+   access_modifer2:
+      field21_definition;
+      field22_definition;
+    };
+#+END_SRC
+ClassName is a new type
+Fields can be variables or functions
+
+** A simple class						      :slide:
+#+BEGIN_SRC c++
+  class PoliceCar {
+    public:
+      float getX() { return locX; }
+      float getY() { return locY; }
+      float getFacing() { return facing; }
+      int getOfficerCount() { return OfficerCount; }
+      void setFacing(float f) { facing = f; }
+      void setLocation(float x, float y);
+    private:
+      float locX;
+      float locY;
+      float facing;
+      int OfficerCount;
+  };
+
+#+END_SRC
+** What does ~private~ mean?					      :slide:
+   - can only be accessed by member of the class
+#+BEGIN_SRC c++
+  void usePoliceCar() {
+    PoliceCar p1;
+    p1.locX = 5.0; //throws error at compile
+  }
+#+END_SRC
+  - ~public~ members can be accessed by anyone
+** C++ structs and classes					      :slide:
+   - you can do everything with structs as with classes
+   -A class assumes private, vice-versa for a struct
+- What about protected?
+   - ~private~ elements can't be inherited, protected can
+** Inheritance							      :slide:
+- One class that is a base for a more useful derived class
+  - A general account class a base for
+    - checking account class
+    - savings account class
+  - A loan class that is a base
+    - student loan
+    - credit card
+    - mortgage
+
+- Public fields are inherited as public
+- Private fields are not inherited
+- Protected fields are inherited
+** Declaration type						      :slide:
+- Unary declaration and implementation
+- Seperate declaration and implementation.
+  - compilation difference
+** Calling a function						      :slide:
+#+BEGIN_SRC c++
+classInstance.FuncName(args)
+#+END_SRC
+** Another example						      :slide:
+#+BEGIN_SRC c++
+  class PoliceCar {
+  public:
+  float getX() { return locX; }
+  };
+  PoliceCar p1;
+
+  cout << p1.getX() << endl;
+#+END_SRC
+- In an inline function, the C++ compiler does not make a function
+  call, instead the code of the function is used in place of the
+  function call (and appropriate argument substitutions made). Why?
+** Inline function facts					      :slide:
+- Less overhead
+- Fast
+- Implicitly requestd and not always honored
+  - complexity based decision
+- You can request global inline functions
+#+BEGIN_SRC c++
+  inline char upcase(char ch) {
+    if ((ch >= ‘a’) && (ch <= ‘z’))
+      return (ch + (‘A’ - ‘a’));
+    else
+      return ch;
+  }
+  cin >> option;
+  if (upcase(option) == ‘Y’) {
+  ...
+  } 
+#+END_SRC
+** Defining methods seperately					      :slide:
+- Use ClassName::FuncName
+- '::' is scope resolution operator
+
+#+BEGIN_SRC c++
+  class PoliceCar {
+   public:
+    void setLocation(float x, float y);
+   private:
+    float locX;
+    float locY;
+    float facing;
+    int numberOfOfficers;
+  };
+  void PoliceCar::setLocation(float x, float y) {
+    if ((x < 0.0) || (y < 0.0)) {
+      cout << “Illegal location!!” << endl;
+    }
+    else {
+      locX = x;
+      locY = y;
+    }
+  }
+#+end_src
+** Using the class function					      :slide:
+#+BEGIN_SRC c++
+PoliceCar p1;
+PoliceCar p2;
+
+p1.setLocation(5,5);
+p2.setLocation(3,1);
+#+END_SRC
+** Taxonomy of class methods					      :slide:
+ - accessors
+ - mutators
+ - managers initialize and destroy the class
+- Why bother?  Why not public?
+
+#+BEGIN_SRC c++
+  class PoliceCar {
+   public:
+    float getX() { return dist * cos(ang); }
+    float getY() { return dist * sin(ang); }
+    void setLocation(float x, float y);
+   private:
+    float dist;
+    float ang;
+  };
+  void PoliceCar::setLocation(float x, float y) {
+    if ((x < 0.0) || (y < 0.0)) {
+      cout << “Illegal location!!” << endl;
+    }
+  else {
+    dist = sqrt(x * x + y * y);
+    ang = atan2(y,x);
+  }
+}
+#+END_SRC
+** Static members						      :slide:
+#+BEGIN_SRC c++ 
+  class PoliceCar {
+   public:
+    static int numPoliceCars = 0;
+    static const float minX = 0.0;
+  static const float maxX = 100.0;
+    void initializePoliceCar() {
+      numPoliceCars++;
+    }
+    void setLocation(float x, float y);
+  }
+    void PoliceCar::setLocation(float x, float y) {
+      if ((x < minX) || (x > maxX))
+  ...
+  }
+#+END_SRC
+** Example of a constructor					      :slide:
+#+BEGIN_SRC c++
+  class PoliceCar {
+   public:
+    static int numPoliceCars = 0;
+    PoliceCar() {
+      numPoliceCars++;
+      locX = 0.0;
+      locY = 0.0;
+      facing = 3.1415 / 2;
+    }
+   private:
+    float locX;
+    float locY;
+    float facing;
+  }
+#+END_SRC
+
+- Generally: To write your own, add following to your class:
+#+BEGIN_SRC c++
+class MyClass {
+public:
+...
+MyClass() {
+code here
+}
+}
+#+END_SRC
+** Destructor							      :slide:
+ - If you take space on the heap, free your memory
+ #+BEGIN_SRC c++
+   class PoliceCar {
+    public:
+     char *policeCarName;
+     PoliceCar() {
+       policeCarName = 0;
+     }
+     void setPoliceCarName(char *name) {
+       policeCarName = new char[strlen(name)+1];
+       strcpy(policeCarName,name);
+     }
+     ~PoliceCar() {
+       delete [] policeCarName;
+     }
+   }
+ #+END_SRC
+** Copy constructor						      :slide:
+#+BEGIN_SRC c++
+class PoliceCar {
+public:
+char *policeCarName;
+void setPoliceCarName(char *name) {
+policeCarName = new char[strlen(name)+1];
+strcpy(policeCarName,name);
+}
+PoliceCar(const PoliceCar& obj) {
+policeCarName = new char[strlen(obj.policeCarName)+1];
+strcpy(policeCarName,obj.policeCarName);
+}
+}
+#+END_SRC
